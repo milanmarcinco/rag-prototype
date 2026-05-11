@@ -1,0 +1,3 @@
+[tools]
+ollama = "0.23.2"
+python = "3.12.0"
