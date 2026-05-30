@@ -1,5 +1,7 @@
 import json
+
 from llama_index.core import Document
+
 
 def load_manuals(json_path, max_manuals=10):
     documents = []
@@ -12,9 +14,9 @@ def load_manuals(json_path, max_manuals=10):
                 continue
 
             manual = json.loads(line)
-            title    = manual.get("Title", "")
+            title = manual.get("Title", "")
             category = manual.get("Category", "")
-            tools    = [t["Name"] for t in manual.get("Toolbox", []) if t.get("Name")]
+            tools = [t["Name"] for t in manual.get("Toolbox", []) if t.get("Name")]
 
             for step in manual.get("Steps", []):
                 text = step.get("Text_raw", "").strip()
@@ -23,11 +25,17 @@ def load_manuals(json_path, max_manuals=10):
 
                 chunk = f"Guide: {title}\nCategory: {category}\nTools: {', '.join(tools)}\nStep {step['Order']}: {text}"
 
-                documents.append(Document(
-                    text=chunk,
-                    metadata={"title": title, "category": category,
-                               "step": step["Order"], "tools": tools}
-                ))
+                documents.append(
+                    Document(
+                        text=chunk,
+                        metadata={
+                            "title": title,
+                            "category": category,
+                            "step": step["Order"],
+                            "tools": tools,
+                        },
+                    )
+                )
 
             manual_count += 1
             if manual_count >= max_manuals:
