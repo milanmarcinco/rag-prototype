@@ -1,19 +1,10 @@
-import os
-
-from typing import Tuple
-
 from llama_index.llms.ollama import Ollama
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.embeddings.ollama import OllamaEmbedding
 
 from llama_index.core import (
-    VectorStoreIndex,
     Settings,
-    StorageContext,
-    load_index_from_storage,
 )
-
-from google.genai.errors import ServerError
 
 from lib.config import (
     DATASET_DIR,
@@ -26,10 +17,9 @@ from lib.config import (
 )
 
 from lib.argparser import args
-from lib.loader import load_manuals
+from lib.indexer import load_or_build_index
 
-QUERY = args.query
-TOP_K = args.top_k
+from lib.helpers import run_query, run_query_prompt
 
 Settings.embed_model = OllamaEmbedding(
     model_name=OLLAMA_EMBED_MODEL,
@@ -54,60 +44,16 @@ else:
         thinking=False,
     )
 
-if os.path.exists(PERSIST_DIR):
-    print("Loading index from disk...", end="\n\n")
+index = load_or_build_index(
+    DATASET_DIR,
+    PERSIST_DIR,
+    max_manuals=args.max_manuals,
+    rebuild_index=args.rebuild_index,
+)
 
-    storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-    index = load_index_from_storage(storage_context)
+query_engine = index.as_query_engine(similarity_top_k=args.top_k)
+
+if args.query:
+    run_query(args.query, query_engine)
 else:
-    print("Building index for the first time...")
-
-    dataset_path = os.path.join(os.getcwd(), DATASET_DIR, "dataset.json")
-    docs = load_manuals(dataset_path, max_manuals=200)
-
-    print(f"Loaded {len(docs)} chunks. Indexing...")
-    index = VectorStoreIndex.from_documents(docs)
-    index.storage_context.persist(persist_dir=PERSIST_DIR)
-    print("Saved to disk.", end="\n\n")
-
-query_engine = index.as_query_engine(similarity_top_k=TOP_K)
-
-
-def get_response(query: str) -> Tuple[str, Exception | None]:
-    try:
-        response = query_engine.query(query)
-    except ServerError as e:
-        return "Sorry, the LLM server is currently unavailable.", e
-    except Exception as e:
-        return "Sorry, something went wrong while processing your query...", e
-
-    return str(response), None
-
-
-def print_response(response: str, error: Exception | None, end: str = "\n") -> None:
-    if error:
-        if type(error) == ServerError:
-            print(f"ERROR: LLM server is currently unavailable.", end=end)
-        else:
-            print(f"ERROR: {error}", end=end)
-    else:
-        print(f"RESPONSE: {response}", end=end)
-
-
-if QUERY:
-    print(f"QUERY: {QUERY}")
-
-    response, error = get_response(QUERY)
-    print_response(response, error)
-else:
-    while True:
-        print("YOUR QUERY: ", end="")
-
-        try:
-            QUERY = input()
-        except (KeyboardInterrupt, EOFError):
-            print("\nExiting...")
-            break
-
-        response, error = get_response(QUERY)
-        print_response(response, error, end="\n\n")
+    run_query_prompt(query_engine)
