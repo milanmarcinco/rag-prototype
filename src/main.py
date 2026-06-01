@@ -1,7 +1,6 @@
 import os
 
-from loader import load_manuals
-from dotenv import load_dotenv
+from typing import Tuple
 
 from llama_index.llms.ollama import Ollama
 from llama_index.llms.google_genai import GoogleGenAI
@@ -14,15 +13,23 @@ from llama_index.core import (
     load_index_from_storage,
 )
 
-load_dotenv()
+from google.genai.errors import ServerError
 
-DATASET_DIR = os.getenv("DATASET_DIR", "dataset")
-PERSIST_DIR = os.getenv("PERSIST_DIR", "storage")
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
-OLLAMA_LLM_MODEL = os.getenv("OLLAMA_LLM_MODEL", "qwen3.5:4b")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_LLM_MODEL = os.getenv("GEMINI_LLM_MODEL", "gemini-2.5-flash")
+from lib.config import (
+    DATASET_DIR,
+    PERSIST_DIR,
+    OLLAMA_BASE_URL,
+    OLLAMA_EMBED_MODEL,
+    OLLAMA_LLM_MODEL,
+    GEMINI_API_KEY,
+    GEMINI_LLM_MODEL,
+)
+
+from lib.argparser import args
+from lib.loader import load_manuals
+
+QUERY = args.query
+TOP_K = args.top_k
 
 Settings.embed_model = OllamaEmbedding(
     model_name=OLLAMA_EMBED_MODEL,
@@ -35,6 +42,7 @@ if GEMINI_API_KEY:
     Settings.llm = GoogleGenAI(
         model=GEMINI_LLM_MODEL,
         api_key=GEMINI_API_KEY,
+        max_retries=0,
     )
 else:
     print("Using Ollama for LLM...")
@@ -62,9 +70,39 @@ else:
     index.storage_context.persist(persist_dir=PERSIST_DIR)
     print("Saved to disk.", end="\n\n")
 
-QUERY = "How do I open the PC case?"
+query_engine = index.as_query_engine(similarity_top_k=TOP_K)
 
-query_engine = index.as_query_engine(similarity_top_k=3)
-print(f"QUERY: {QUERY}")
-response = query_engine.query(QUERY)
-print(f"RESPONSE: {response}")
+
+def get_response(query: str) -> Tuple[str, Exception | None]:
+    try:
+        response = query_engine.query(query)
+    except ServerError as e:
+        return "Sorry, the LLM server is currently unavailable.", e
+    except Exception as e:
+        return "Sorry, something went wrong while processing your query...", e
+
+    return str(response), None
+
+
+def print_response(response: str, error: Exception | None, end: str = "\n") -> None:
+    if error:
+        if type(error) == ServerError:
+            print(f"ERROR: LLM server is currently unavailable.", end=end)
+        else:
+            print(f"ERROR: {error}", end=end)
+    else:
+        print(f"RESPONSE: {response}", end=end)
+
+
+if QUERY:
+    print(f"QUERY: {QUERY}")
+
+    response, error = get_response(QUERY)
+    print_response(response, error)
+else:
+    while True:
+        print("YOUR QUERY: ", end="")
+        QUERY = input()
+
+        response, error = get_response(QUERY)
+        print_response(response, error, end="\n\n")
