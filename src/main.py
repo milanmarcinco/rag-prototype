@@ -102,7 +102,12 @@ if QUERY:
 else:
     while True:
         print("YOUR QUERY: ", end="")
-        QUERY = input()
+
+        try:
+            QUERY = input()
+        except (KeyboardInterrupt, EOFError):
+            print("\nExiting...")
+            break
 
         response, error = get_response(QUERY)
         print_response(response, error, end="\n\n")
