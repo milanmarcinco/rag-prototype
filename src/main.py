@@ -2,9 +2,7 @@ from llama_index.llms.ollama import Ollama
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.embeddings.ollama import OllamaEmbedding
 
-from llama_index.core import (
-    Settings,
-)
+from llama_index.core import Settings
 
 from lib.config import (
     DATASET_DIR,
@@ -18,7 +16,7 @@ from lib.config import (
 
 from lib.argparser import args
 from lib.indexer import load_or_build_index
-
+from lib.retriever import build_hybrid_query_engine
 from lib.helpers import run_query, run_query_prompt
 
 Settings.embed_model = OllamaEmbedding(
@@ -51,7 +49,7 @@ index = load_or_build_index(
     rebuild_index=args.rebuild_index,
 )
 
-query_engine = index.as_query_engine(similarity_top_k=args.top_k)
+query_engine = build_hybrid_query_engine(index, top_k=args.top_k)
 
 if args.query:
     run_query(args.query, query_engine)

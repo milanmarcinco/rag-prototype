@@ -1,8 +1,9 @@
 import os
 import shutil
 
+from typing import cast
+
 from llama_index.core import StorageContext, VectorStoreIndex, load_index_from_storage
-from llama_index.core.indices.base import BaseIndex
 
 from lib.loader import load_manuals
 
@@ -26,7 +27,7 @@ def load_or_build_index(
     persist_dir: str,
     max_manuals: int,
     rebuild_index: bool = False,
-) -> BaseIndex:
+) -> VectorStoreIndex:
     if rebuild_index:
         print("Rebuilding index from source manuals...")
 
@@ -39,7 +40,7 @@ def load_or_build_index(
         print("Loading index from disk...")
 
         storage_context = StorageContext.from_defaults(persist_dir=persist_dir)
-        index = load_index_from_storage(storage_context)
+        index = cast(VectorStoreIndex, load_index_from_storage(storage_context))
 
         print("Index loaded successfully.", end="\n\n")
 
