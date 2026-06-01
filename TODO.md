@@ -1,5 +1,22 @@
 # TODO
 
+Milan's chaotic notes for next steps and what to check.
+
+```txt
+- hybrid search
+	- lexical search
+		- tweak pipeline
+	- semantic search
+	- reranking
+		- separate model?
+- prompt design
+	- custom template
+	- hallucination mitigation
+	- answer grounding
+- print source documents
+- evaluation
+```
+
 ## 1. Prototype Usability
 
 - [x] Replace the hard-coded query in `src/main.py` with CLI input.
