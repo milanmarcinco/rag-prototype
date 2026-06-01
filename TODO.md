@@ -12,12 +12,12 @@
 
 ## 2. Code Structure
 
-- [ ] Move environment/config loading into `src/config.py`.
-- [ ] Move index build/load logic into `src/indexer.py`.
-- [ ] Move query and answer logic into `src/rag.py`.
-- [ ] Keep `src/main.py` as the CLI entry point only.
+- [x] Move environment/config loading into `src/config.py`.
+- [x] Move index build/load logic into `src/indexer.py`.
+- [x] Move query and answer logic into `src/rag.py`.
+- [x] Keep `src/main.py` as the CLI entry point only.
 - [ ] Add small helper functions for formatting sources and metadata.
-- [ ] Make `max_manuals` configurable instead of fixed in code.
+- [x] Make `max_manuals` configurable instead of fixed in code.
 
 ## 3. RAG Quality
 
