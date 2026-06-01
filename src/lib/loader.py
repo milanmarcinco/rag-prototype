@@ -1,5 +1,4 @@
 import json
-
 from llama_index.core import Document
 
 
@@ -18,27 +17,36 @@ def load_manuals(json_path, max_manuals=10):
             category = manual.get("Category", "")
             tools = [t["Name"] for t in manual.get("Toolbox", []) if t.get("Name")]
 
+            steps_text = ""
             for step in manual.get("Steps", []):
                 text = step.get("Text_raw", "").strip()
-                if not text:
-                    continue
+                if text:
+                    steps_text += f"Step {step['Order']}: {text}\n"
 
-                chunk = f"Guide: {title}\nCategory: {category}\nTools: {', '.join(tools)}\nStep {step['Order']}: {text}"
+            if not steps_text:
+                continue
 
-                documents.append(
+            chunk = f"Guide: {title}\nCategory: {category}\nTools: {', '.join(tools)}\n\n{steps_text}"
+            
+            documents.append(
                     Document(
                         text=chunk,
                         metadata={
                             "title": title,
                             "category": category,
-                            "step": step["Order"],
                             "tools": tools,
                         },
                     )
-                )
+            )
 
             manual_count += 1
             if manual_count >= max_manuals:
                 break
 
     return documents
+
+
+# docs = load_manuals("Phone.json", max_manuals=3)
+# print(f"Number of documents: {len(docs)}")
+# print("\n--- First document ---")
+# print(docs[0].text)
