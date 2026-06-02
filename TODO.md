@@ -1,22 +1,5 @@
 # TODO
 
-Milan's chaotic notes for next steps and what to check.
-
-```txt
-- hybrid search
-	- lexical search
-		- tweak pipeline
-	- semantic search
-	- reranking
-		- separate model?
-- prompt design
-	- custom template
-	- hallucination mitigation
-	- answer grounding
-- print source documents
-- evaluation
-```
-
 ## 1. Prototype Usability
 
 - [x] Replace the hard-coded query in `src/main.py` with CLI input.
@@ -41,7 +24,6 @@ Milan's chaotic notes for next steps and what to check.
 - [x] Add a custom prompt template for grounded repair answers.
 - [x] Instruct the model to answer only from retrieved context.
 - [x] Instruct the model to say when retrieved evidence is insufficient.
-- [ ] Require citations using guide title and step number.
 - [ ] Test at least 5 representative repair questions manually.
 - [ ] Tune `similarity_top_k` based on observed retrieval quality.
 
