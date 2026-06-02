@@ -52,6 +52,13 @@ index = load_or_build_index(
 query_engine = build_hybrid_query_engine(index, top_k=args.top_k)
 
 if args.query:
-    run_query(args.query, query_engine)
+    run_query(
+        args.query,
+        query_engine,
+        print_source_documents=args.print_sources,
+    )
 else:
-    run_query_prompt(query_engine)
+    run_query_prompt(
+        query_engine,
+        print_source_documents=args.print_sources,
+    )

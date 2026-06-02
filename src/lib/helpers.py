@@ -1,23 +1,26 @@
-from typing import Tuple
+from typing import Any, Tuple, cast
 
 from llama_index.core.base.base_query_engine import BaseQueryEngine
+from llama_index.core.base.response.schema import Response
 from google.genai.errors import ServerError
 
 
 def get_response(
     query: str, query_engine: BaseQueryEngine
-) -> Tuple[str, Exception | None]:
+) -> Tuple[Response | None, Exception | None]:
     try:
-        response = query_engine.query(query)
+        response = cast(Response, query_engine.query(query))
     except ServerError as e:
-        return "Sorry, the LLM server is currently unavailable.", e
+        return None, e
     except Exception as e:
-        return "Sorry, something went wrong while processing your query...", e
+        return None, e
 
-    return str(response), None
+    return response, None
 
 
-def print_response(response: str, error: Exception | None, end: str = "\n") -> None:
+def print_response(
+    response: Response | None, error: Exception | None, end: str = "\n"
+) -> None:
     if error:
         if type(error) == ServerError:
             print(f"ERROR: LLM server is currently unavailable.", end=end)
@@ -27,17 +30,69 @@ def print_response(response: str, error: Exception | None, end: str = "\n") -> N
         print(f"RESPONSE: {response}", end=end)
 
 
-def answer_query(query: str, query_engine: BaseQueryEngine, end: str = "\n") -> None:
+def format_source(source: Any, index: int) -> str:
+    node = source.node
+    metadata = node.metadata or {}
+    score = getattr(source, "score", None)
+    score_text = f" | Score: {score:.4f}" if score is not None else ""
+
+    title = metadata.get("title") or "Unknown guide"
+    category = metadata.get("category") or "Unknown category"
+    step = metadata.get("step") or "Unknown step"
+    text = node.get_content().strip()
+
+    return f"[{index}] {title} | {category}{score_text}\n" f"{text}"
+
+
+def print_sources(response: Response | None, end: str = "\n") -> None:
+    sources = getattr(response, "source_nodes", None) or []
+
+    if not sources:
+        print("SOURCES: No source documents were returned.", end=end)
+        return
+
+    print("SOURCES:")
+    for index, source in enumerate(sources, start=1):
+        print(format_source(source, index))
+        if index < len(sources):
+            print()
+
+    print(end=end)
+
+
+def answer_query(
+    query: str,
+    query_engine: BaseQueryEngine,
+    print_source_documents: bool = False,
+    end: str = "\n",
+) -> None:
     response, error = get_response(query, query_engine)
-    print_response(response, error, end=end)
+
+    if print_source_documents and error is None:
+        print_response(response, error, end='\n\n')
+        print_sources(response, end=end)
+    else:
+        print_response(response, error, end=end)
 
 
-def run_query(query: str, query_engine: BaseQueryEngine) -> None:
+def run_query(
+    query: str,
+    query_engine: BaseQueryEngine,
+    print_source_documents: bool = False,
+) -> None:
     print(f"QUERY: {query}")
-    answer_query(query, query_engine)
+
+    answer_query(
+        query,
+        query_engine,
+        print_source_documents=print_source_documents,
+    )
 
 
-def run_query_prompt(query_engine: BaseQueryEngine) -> None:
+def run_query_prompt(
+    query_engine: BaseQueryEngine,
+    print_source_documents: bool = False,
+) -> None:
     while True:
         print("YOUR QUERY: ", end="")
 
@@ -47,4 +102,9 @@ def run_query_prompt(query_engine: BaseQueryEngine) -> None:
             print("\nExiting...")
             break
 
-        answer_query(query, query_engine, end="\n\n")
+        answer_query(
+            query,
+            query_engine,
+            print_source_documents=print_source_documents,
+            end="\n\n",
+        )

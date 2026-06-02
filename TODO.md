@@ -24,8 +24,8 @@ Milan's chaotic notes for next steps and what to check.
 - [x] Add an interactive mode for asking multiple questions in one run.
 - [x] Add a `--top-k` argument for retrieval depth.
 - [x] Add a `--rebuild-index` flag to force index regeneration.
-- [ ] Print clear answer output followed by retrieved source evidence.
-- [ ] Show each source chunk's guide title, category, step number, and text.
+- [x] Print clear answer output followed by retrieved source evidence.
+- [x] Show each source chunk's guide title, category, step number, and text.
 
 ## 2. Code Structure
 
@@ -33,7 +33,7 @@ Milan's chaotic notes for next steps and what to check.
 - [x] Move index build/load logic into `src/indexer.py`.
 - [x] Move query and answer logic into `src/rag.py`.
 - [x] Keep `src/main.py` as the CLI entry point only.
-- [ ] Add small helper functions for formatting sources and metadata.
+- [x] Add small helper functions for formatting sources and metadata.
 - [x] Make `max_manuals` configurable instead of fixed in code.
 
 ## 3. RAG Quality
