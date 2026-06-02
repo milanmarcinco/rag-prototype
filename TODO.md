@@ -38,9 +38,9 @@ Milan's chaotic notes for next steps and what to check.
 
 ## 3. RAG Quality
 
-- [ ] Add a custom prompt template for grounded repair answers.
-- [ ] Instruct the model to answer only from retrieved context.
-- [ ] Instruct the model to say when retrieved evidence is insufficient.
+- [x] Add a custom prompt template for grounded repair answers.
+- [x] Instruct the model to answer only from retrieved context.
+- [x] Instruct the model to say when retrieved evidence is insufficient.
 - [ ] Require citations using guide title and step number.
 - [ ] Test at least 5 representative repair questions manually.
 - [ ] Tune `similarity_top_k` based on observed retrieval quality.

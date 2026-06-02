@@ -1,10 +1,28 @@
-from typing import cast
-
 from llama_index.core import VectorStoreIndex
+from llama_index.core.prompts import PromptTemplate
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.retrievers import QueryFusionRetriever
 from llama_index.core.retrievers.fusion_retriever import FUSION_MODES
 from llama_index.retrievers.bm25 import BM25Retriever
+
+REPAIR_QUERY_TEMPLATE = """
+You are a careful repair assistant.
+Answer the question using only the retrieved repair-manual context below.
+
+Rules:
+- If the context does not contain enough evidence, say that the retrieved manuals do not provide enough information.
+- Do not invent tools, steps, warnings, measurements, or part names.
+- Prefer clear step-by-step repair guidance when the context supports it.
+- Mention relevant safety warnings from the context.
+
+Retrieved context:
+{context_str}
+
+Question:
+{query_str}
+
+Grounded answer:
+"""
 
 
 def build_hybrid_query_engine(
@@ -29,4 +47,7 @@ def build_hybrid_query_engine(
         use_async=False,
     )
 
-    return RetrieverQueryEngine.from_args(hybrid_retriever)
+    return RetrieverQueryEngine.from_args(
+        hybrid_retriever,
+        text_qa_template=PromptTemplate(REPAIR_QUERY_TEMPLATE),
+    )
