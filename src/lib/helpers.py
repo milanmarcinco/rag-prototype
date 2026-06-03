@@ -38,7 +38,6 @@ def format_source(source: Any, index: int) -> str:
 
     title = metadata.get("title") or "Unknown guide"
     category = metadata.get("category") or "Unknown category"
-    step = metadata.get("step") or "Unknown step"
     text = node.get_content().strip()
 
     return f"[{index}] {title} | {category}{score_text}\n" f"{text}"
