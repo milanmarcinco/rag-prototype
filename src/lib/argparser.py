@@ -8,7 +8,10 @@ class Args(Namespace):
     query: Optional[str] = None
     top_k: int = 3
     print_sources: bool = False
+    retriever_only: bool = False
     max_manuals: int = 100
+    steps_per_chunk: int | None = None
+    steps_overlap: int = 0
     rebuild_index: bool = False
 
 
@@ -35,10 +38,30 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--retriever-only",
+    action="store_true",
+    help="Only retrieve matching chunks. Do not call an LLM to generate an answer. Does not require --print-sources to be set, as source documents will be printed by default in this mode.",
+)
+
+parser.add_argument(
     "--max-manuals",
     type=int,
     default=100,
     help="Maximum number of manuals to load and index from the dataset.",
+)
+
+parser.add_argument(
+    "--steps-per-chunk",
+    type=int,
+    default=None,
+    help="Number of steps to include in each document chunk. If not set, all steps will be included in a single chunk.",
+)
+
+parser.add_argument(
+    "--steps-overlap",
+    type=int,
+    default=0,
+    help="Number of steps to overlap between consecutive document chunks.",
 )
 
 parser.add_argument(
@@ -53,6 +76,9 @@ args = Args(
     query=ns.query,
     top_k=ns.top_k,
     print_sources=ns.print_sources,
+    retriever_only=ns.retriever_only,
     max_manuals=ns.max_manuals,
+    steps_per_chunk=ns.steps_per_chunk,
+    steps_overlap=ns.steps_overlap,
     rebuild_index=ns.rebuild_index,
 )

@@ -1,8 +1,8 @@
 from llama_index.llms.ollama import Ollama
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.embeddings.ollama import OllamaEmbedding
-
 from llama_index.core import Settings
+from llama_index.core.llms.mock import MockLLM
 
 from lib.config import (
     DATASET_DIR,
@@ -24,7 +24,10 @@ Settings.embed_model = OllamaEmbedding(
     base_url=OLLAMA_BASE_URL,
 )
 
-if GEMINI_API_KEY:
+if args.retriever_only:
+    print("Using retriever-only mode...")
+    Settings.llm = MockLLM(max_tokens=0)
+elif GEMINI_API_KEY:
     print("Using Gemini API for LLM...")
 
     Settings.llm = GoogleGenAI(
@@ -42,13 +45,7 @@ else:
         thinking=False,
     )
 
-index = load_or_build_index(
-    DATASET_DIR,
-    PERSIST_DIR,
-    max_manuals=args.max_manuals,
-    rebuild_index=args.rebuild_index,
-)
-
+index = load_or_build_index(DATASET_DIR, PERSIST_DIR)
 query_engine = build_hybrid_query_engine(index, top_k=args.top_k)
 
 if args.query:
