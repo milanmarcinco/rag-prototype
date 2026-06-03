@@ -11,6 +11,7 @@ Answer the question using only the retrieved repair-manual context below.
 
 Rules:
 - If the context does not contain enough evidence, say that the retrieved manuals do not provide enough information.
+- If the user does not ask about a specific device, try to generalize the answer based on the retrieved manuals. Do not mention devices the user did not ask about.
 - Do not invent tools, steps, warnings, measurements, or part names.
 - Prefer clear step-by-step repair guidance when the context supports it.
 - Mention relevant safety warnings from the context.
