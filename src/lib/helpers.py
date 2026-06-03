@@ -2,14 +2,28 @@ from typing import Any, Tuple, cast
 
 from llama_index.core.base.base_query_engine import BaseQueryEngine
 from llama_index.core.base.response.schema import Response
+
 from google.genai.errors import ServerError
+
+from lib.argparser import args
 
 
 def get_response(
     query: str, query_engine: BaseQueryEngine
 ) -> Tuple[Response | None, Exception | None]:
     try:
-        response = cast(Response, query_engine.query(query))
+        if args.retriever_only:
+            retriever = getattr(query_engine, "retriever", None) or getattr(
+                query_engine, "_retriever", None
+            )
+
+            if retriever is None:
+                raise ValueError("Query engine does not expose a retriever.")
+
+            source_nodes = retriever.retrieve(query)
+            response = Response(response="", source_nodes=source_nodes)
+        else:
+            response = cast(Response, query_engine.query(query))
     except ServerError as e:
         return None, e
     except Exception as e:
@@ -67,8 +81,10 @@ def answer_query(
 ) -> None:
     response, error = get_response(query, query_engine)
 
-    if print_source_documents and error is None:
-        print_response(response, error, end='\n\n')
+    if args.retriever_only and error is None:
+        print_sources(response, end=end)
+    elif print_source_documents and error is None:
+        print_response(response, error, end="\n\n")
         print_sources(response, end=end)
     else:
         print_response(response, error, end=end)

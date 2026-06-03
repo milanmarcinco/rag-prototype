@@ -8,6 +8,7 @@ class Args(Namespace):
     query: Optional[str] = None
     top_k: int = 3
     print_sources: bool = False
+    retriever_only: bool = False
     max_manuals: int = 100
     steps_per_chunk: int | None = None
     steps_overlap: int = 0
@@ -34,6 +35,12 @@ parser.add_argument(
     "--print-sources",
     action="store_true",
     help="Whether to print the source documents used to answer the question.",
+)
+
+parser.add_argument(
+    "--retriever-only",
+    action="store_true",
+    help="Only retrieve matching chunks. Do not call an LLM to generate an answer. Does not require --print-sources to be set, as source documents will be printed by default in this mode.",
 )
 
 parser.add_argument(
@@ -69,6 +76,7 @@ args = Args(
     query=ns.query,
     top_k=ns.top_k,
     print_sources=ns.print_sources,
+    retriever_only=ns.retriever_only,
     max_manuals=ns.max_manuals,
     steps_per_chunk=ns.steps_per_chunk,
     steps_overlap=ns.steps_overlap,
