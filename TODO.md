@@ -24,7 +24,7 @@
 - [x] Add a custom prompt template for grounded repair answers.
 - [x] Instruct the model to answer only from retrieved context.
 - [x] Instruct the model to say when retrieved evidence is insufficient.
-- [ ] Test at least 5 representative repair questions manually.
+- [x] Test at least 5 representative repair questions manually.
 - [ ] Tune `similarity_top_k` based on observed retrieval quality.
 
 ## 4. Corpus Preparation
