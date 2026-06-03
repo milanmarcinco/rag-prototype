@@ -1,5 +1,10 @@
 import json
+
+from typing import List
+
 from llama_index.core import Document
+
+from lib.argparser import args
 
 CHUNK_TEMPLATE = """
 Guide: {title}
@@ -10,7 +15,7 @@ Tools: {tools}
 """
 
 
-def load_manuals(json_path, max_manuals=10):
+def load_manuals(json_path: str):
     documents = []
     manual_count = 0
 
@@ -26,37 +31,43 @@ def load_manuals(json_path, max_manuals=10):
             category = manual.get("Category", "")
             tools = [t["Name"] for t in manual.get("Toolbox", []) if t.get("Name")]
 
-            steps_text = ""
+            steps: List[str] = []
+
             for step in manual.get("Steps", []):
                 text = step.get("Text_raw", "").strip()
+                step_order = int(step.get("Order", 0)) + 1
+                steps.append(f"Step {step_order}: {text}")
 
-                if not text:
-                    continue
+            chunk_size = args.steps_per_chunk or len(steps)
+            overlap = args.steps_overlap if args.steps_per_chunk else 0
 
+            chunk_start = 0
+            while chunk_start < len(steps):
+                step_chunk = steps[chunk_start : chunk_start + chunk_size]
+                steps_text = "\n".join(step_text for step_text in step_chunk)
 
-                step = int(step.get("Order", 0)) + 1
-                steps_text += f"Step {step}: {text}\n"
+                chunk = CHUNK_TEMPLATE.format(
+                    title=title,
+                    category=category,
+                    tools=", ".join(tools),
+                    steps_text=steps_text,
+                )
 
-            if not steps_text:
-                continue
+                metadata = {
+                    "title": title,
+                    "category": category,
+                    "tools": tools,
+                }
 
-            chunk = CHUNK_TEMPLATE.format(
-                title=title,
-                category=category,
-                tools=", ".join(tools),
-                steps_text=steps_text,
-            )
+                documents.append(Document(text=chunk, extra_info=metadata))
 
-            metadata = {
-                "title": title,
-                "category": category,
-                "tools": tools,
-            }
+                if chunk_start + chunk_size >= len(steps):
+                    break
 
-            documents.append(Document(text=chunk, extra_info=metadata))
+                chunk_start += chunk_size - overlap
 
             manual_count += 1
-            if manual_count >= max_manuals:
+            if manual_count >= args.max_manuals:
                 break
 
     return documents

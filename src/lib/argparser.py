@@ -9,6 +9,8 @@ class Args(Namespace):
     top_k: int = 3
     print_sources: bool = False
     max_manuals: int = 100
+    steps_per_chunk: int | None = None
+    steps_overlap: int = 0
     rebuild_index: bool = False
 
 
@@ -42,6 +44,20 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--steps-per-chunk",
+    type=int,
+    default=None,
+    help="Number of steps to include in each document chunk. If not set, all steps will be included in a single chunk.",
+)
+
+parser.add_argument(
+    "--steps-overlap",
+    type=int,
+    default=0,
+    help="Number of steps to overlap between consecutive document chunks.",
+)
+
+parser.add_argument(
     "--rebuild-index",
     action="store_true",
     help="Force the persisted index to be regenerated before querying.",
@@ -54,5 +70,7 @@ args = Args(
     top_k=ns.top_k,
     print_sources=ns.print_sources,
     max_manuals=ns.max_manuals,
+    steps_per_chunk=ns.steps_per_chunk,
+    steps_overlap=ns.steps_overlap,
     rebuild_index=ns.rebuild_index,
 )

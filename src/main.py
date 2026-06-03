@@ -42,13 +42,7 @@ else:
         thinking=False,
     )
 
-index = load_or_build_index(
-    DATASET_DIR,
-    PERSIST_DIR,
-    max_manuals=args.max_manuals,
-    rebuild_index=args.rebuild_index,
-)
-
+index = load_or_build_index(DATASET_DIR, PERSIST_DIR)
 query_engine = build_hybrid_query_engine(index, top_k=args.top_k)
 
 if args.query:
