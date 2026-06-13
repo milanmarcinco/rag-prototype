@@ -5,7 +5,7 @@ from typing import List
 from llama_index.core import Document
 
 from lib.argparser import args
-from lib.text_mining import analyse_guide
+from lib.text_mining import analyse_guide, calculate_raw_complexity_score
 
 CHUNK_TEMPLATE = """
 Id: {id}
@@ -20,6 +20,25 @@ Tools: {tools}
 def load_manuals(json_path: str):
     documents = []
     manual_count = 0
+
+    corpus_scores = []
+
+    with open(json_path, "r") as f:
+        for line in f:
+            if not line.strip():
+                continue
+
+            manual = json.loads(line)
+            tools = [t["Name"] for t in manual.get("Toolbox", []) if t.get("Name")]
+
+            steps = [
+                step.get("Text_raw", "").strip() for step in manual.get("Steps", [])
+            ]
+
+            complexity_score = calculate_raw_complexity_score(steps, tools)
+            corpus_scores.append(complexity_score)
+
+    corpus_scores.sort()
 
     with open(json_path, "r") as f:
         for line in f:
@@ -41,7 +60,7 @@ def load_manuals(json_path: str):
                 step_order = int(step.get("Order", 0)) + 1
                 steps.append(f"Step {step_order}: {text}")
 
-            analysis = analyse_guide(steps, tools)
+            analysis = analyse_guide(steps, tools, corpus_scores)
 
             chunk_size = args.steps_per_chunk or len(steps)
             overlap = args.steps_overlap if args.steps_per_chunk else 0

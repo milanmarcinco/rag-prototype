@@ -1,3 +1,4 @@
+from bisect import bisect_left, bisect_right
 from collections.abc import Sequence
 from typing import TypedDict
 
@@ -31,7 +32,7 @@ ACTION_VERBS = (
 )
 
 GUIDE_ANALYSIS_TEMPLATE = """
-Complexity: {complexity_label} (score {complexity_score})
+Complexity: {complexity_label} (score {complexity_score}/100)
 Total steps: {num_steps}
 Total tools: {num_tools}
 Risk indicators: {risk_terms}
@@ -48,7 +49,10 @@ class GuideAnalysis(TypedDict):
     complexity_label: str
 
 
-def analyse_guide(steps: Sequence[str], tools: Sequence[str]) -> GuideAnalysis:
+def calculate_raw_complexity_score(
+    steps: Sequence[str],
+    tools: Sequence[str],
+) -> int:
     full_text = " ".join(steps).lower()
 
     risk_terms = [term for term in RISK_TERMS if term in full_text]
@@ -58,9 +62,44 @@ def analyse_guide(steps: Sequence[str], tools: Sequence[str]) -> GuideAnalysis:
         len(steps) + len(tools) * 2 + len(risk_terms) * 3 + sum(action_counts.values())
     )
 
-    if complexity_score < 20:
+    return complexity_score
+
+
+def normalise_complexity_score(
+    raw_score: int,
+    sorted_corpus_scores: Sequence[int],
+) -> int:
+    if len(sorted_corpus_scores) <= 1:
+        return 50
+
+    first_rank = bisect_left(sorted_corpus_scores, raw_score)
+    last_rank = bisect_right(sorted_corpus_scores, raw_score) - 1
+
+    average_rank = (first_rank + last_rank) / 2
+
+    return round(average_rank / (len(sorted_corpus_scores) - 1) * 100)
+
+
+def analyse_guide(
+    steps: Sequence[str],
+    tools: Sequence[str],
+    sorted_corpus_scores: Sequence[int],
+) -> GuideAnalysis:
+    full_text = " ".join(steps).lower()
+
+    risk_terms = [term for term in RISK_TERMS if term in full_text]
+    action_counts = {verb: full_text.count(verb) for verb in ACTION_VERBS}
+
+    raw_complexity_score = calculate_raw_complexity_score(steps, tools)
+
+    complexity_score = normalise_complexity_score(
+        raw_complexity_score,
+        sorted_corpus_scores,
+    )
+
+    if complexity_score <= 33:
         complexity_label = "low"
-    elif complexity_score < 50:
+    elif complexity_score <= 66:
         complexity_label = "medium"
     else:
         complexity_label = "high"
