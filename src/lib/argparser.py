@@ -5,14 +5,14 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class Args(Namespace):
-    query: Optional[str] = None
-    top_k: int = 3
-    print_sources: bool = False
-    retriever_only: bool = False
-    max_manuals: int = 100
-    steps_per_chunk: int | None = None
-    steps_overlap: int = 0
-    rebuild_index: bool = False
+    query: Optional[str]
+    top_k: int
+    print_sources: bool
+    retriever_only: bool
+    max_manuals: int
+    steps_per_chunk: int | None
+    steps_overlap: int
+    rebuild_index: bool
 
 
 parser = ArgumentParser(description="Ask a question over the repair manual index.")
@@ -34,12 +34,14 @@ parser.add_argument(
 parser.add_argument(
     "--print-sources",
     action="store_true",
+    default=False,
     help="Whether to print the source documents used to answer the question.",
 )
 
 parser.add_argument(
     "--retriever-only",
     action="store_true",
+    default=False,
     help="Only retrieve matching chunks. Do not call an LLM to generate an answer. Does not require --print-sources to be set, as source documents will be printed by default in this mode.",
 )
 
@@ -67,6 +69,7 @@ parser.add_argument(
 parser.add_argument(
     "--rebuild-index",
     action="store_true",
+    default=False,
     help="Force the persisted index to be regenerated before querying.",
 )
 

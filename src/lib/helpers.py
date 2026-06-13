@@ -6,6 +6,15 @@ from llama_index.core.base.response.schema import Response
 from google.genai.errors import ServerError
 
 from lib.argparser import args
+from lib.text_mining import GuideAnalysis, format_guide_analysis
+
+SOURCE_TEMPLATE = """
+[{index}] {title} | {category}{score_text}
+
+{analysis_text}
+
+{text}
+"""
 
 
 def get_response(
@@ -54,7 +63,29 @@ def format_source(source: Any, index: int) -> str:
     category = metadata.get("category") or "Unknown category"
     text = node.get_content().strip()
 
-    return f"[{index}] {title} | {category}{score_text}\n" f"{text}"
+    analysis_keys = {
+        "num_steps",
+        "num_tools",
+        "risk_terms",
+        "action_counts",
+        "complexity_score",
+        "complexity_label",
+    }
+
+    analysis_text = ""
+
+    if analysis_keys.issubset(metadata):
+        analysis = cast(GuideAnalysis, metadata)
+        analysis_text = format_guide_analysis(analysis)
+
+    return SOURCE_TEMPLATE.format(
+        index=index,
+        title=title,
+        category=category,
+        score_text=score_text,
+        analysis_text=analysis_text,
+        text=text,
+    ).strip()
 
 
 def print_sources(response: Response | None, end: str = "\n") -> None:

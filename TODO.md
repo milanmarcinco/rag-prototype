@@ -38,13 +38,13 @@
 
 ## 5. Text Mining Features
 
-- [ ] Create `src/text_mining.py`.
+- [x] Create `src/lib/text_mining.py`.
 - [ ] Implement keyword extraction for retrieved chunks.
 - [ ] Implement summarization of retrieved repair evidence.
 - [ ] Implement category/topic distribution for retrieved chunks.
 - [ ] Implement corpus statistics by category/tool/subject.
-- [ ] Add one stronger feature: clustering or classification.
-- [ ] Display text-mining output in the CLI demo.
+- [x] Add repair complexity and risk classification.
+- [x] Display text-mining output in the CLI demo.
 - [ ] Save at least one text-mining example for the report.
 
 ## 6. Evaluation

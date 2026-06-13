@@ -5,6 +5,7 @@ from typing import List
 from llama_index.core import Document
 
 from lib.argparser import args
+from lib.text_mining import analyse_guide
 
 CHUNK_TEMPLATE = """
 Id: {id}
@@ -40,6 +41,8 @@ def load_manuals(json_path: str):
                 step_order = int(step.get("Order", 0)) + 1
                 steps.append(f"Step {step_order}: {text}")
 
+            analysis = analyse_guide(steps, tools)
+
             chunk_size = args.steps_per_chunk or len(steps)
             overlap = args.steps_overlap if args.steps_per_chunk else 0
 
@@ -61,6 +64,7 @@ def load_manuals(json_path: str):
                     "title": title,
                     "category": category,
                     "tools": tools,
+                    **analysis,
                 }
 
                 documents.append(Document(text=chunk, extra_info=metadata))

@@ -18,9 +18,17 @@ Answer the question using only the retrieved repair-manual context below.
     Rewrite the step to be self-contained or omit it if it contains no action.
 - Step Clarity: Keep numbered steps concise and action-oriented. Do not copy and paste massive paragraphs of safety warnings directly into a numbered step if they are already in the Prerequisites section.
 - Context Check: If the instructions start in the middle of a procedure (e.g., separating components without explaining how to open the device first), include a brief introductory note stating that these instructions pick up after the device has already been opened.
+- Text-Mining Metadata: The retrieved context may include guide-level fields named num_steps, num_tools, risk_terms, action_counts, complexity_score, and complexity_label.
+    Treat these fields as a heuristic summary, not a safety certification. Do not combine scores from different guides.
 
 ## Response Format
 If the query is specific or only one device's context is retrieved, produce your answer in this exact structure:
+
+### Repair Complexity & Risk
+Name the relevant guide and describe its guide-level complexity using the mined metadata.
+Include the score, total steps, total tools, risk indicators, and most common actions with non-zero counts.
+Describe a "medium" label as "moderately complex".
+If the metadata is unavailable, say that complexity analysis is unavailable.
 
 ### Tools Needed
 List every tool mentioned in the retrieved context that is required for this procedure. 
