@@ -7,6 +7,7 @@ from llama_index.core import Document
 from lib.argparser import args
 
 CHUNK_TEMPLATE = """
+Id: {id}
 Guide: {title}
 Category: {category}
 Tools: {tools}
@@ -27,6 +28,7 @@ def load_manuals(json_path: str):
                 continue
 
             manual = json.loads(line)
+            id = manual.get("Guidid", "")
             title = manual.get("Title", "")
             category = manual.get("Category", "")
             tools = [t["Name"] for t in manual.get("Toolbox", []) if t.get("Name")]
@@ -47,6 +49,7 @@ def load_manuals(json_path: str):
                 steps_text = "\n".join(step_text for step_text in step_chunk)
 
                 chunk = CHUNK_TEMPLATE.format(
+                    id=id,
                     title=title,
                     category=category,
                     tools=", ".join(tools),
@@ -54,6 +57,7 @@ def load_manuals(json_path: str):
                 )
 
                 metadata = {
+                    "id": id,
                     "title": title,
                     "category": category,
                     "tools": tools,
