@@ -105,3 +105,31 @@
 - [ ] Check that README instructions match the actual commands.
 - [x] Check that report claims match implemented features.
 - [ ] Commit source code, docs, report, and evaluation files.
+
+---
+
+Shortcomings to address.
+
+- Architecture diagram does not explicitly show the text-mining stage.
+- Design justification is limited; corpus, generator, chunking, and text-mining choices need stronger justification.
+- No explanation for indexing only the first 100 guides by default.
+- Data-cleaning and validation procedures are barely described.
+- Vector storage implementation is vague; identify the actual LlamaIndex storage mechanism.
+- No justification for choosing `nomic-embed-text`, Gemini, or Qwen.
+- No concrete example showing how retrieved context is injected into a prompt.
+- No sample query, retrieved sources, generated answer, or text-mining output.
+- Text-mining section lacks validation of the complexity heuristic.
+- Keyword extraction, summarization, topic modelling, and clustering are not implemented.
+- One evaluation question is incomplete.
+- Evaluation corpus does not contain most benchmark source guides.
+- Retrieval quality results are missing.
+- Answer-quality results and scoring rubric are missing.
+- User-usefulness results are missing.
+- No successful and failed query examples or failure analysis.
+- Results section mostly restates implemented features instead of reporting observed results.
+- No latency, index-building time, or resource-use measurements.
+- No comparison between dense, BM25, and hybrid retrieval.
+- No comparison between Gemini and Ollama generation.
+- Future improvements should explicitly cover prompt improvements and corpus quality.
+- Conclusion does not state concrete lessons learned.
+- References or citations for MyFixit, LlamaIndex, BM25, reciprocal-rank fusion, models, and frameworks are missing.
