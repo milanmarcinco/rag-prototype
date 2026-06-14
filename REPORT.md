@@ -8,8 +8,8 @@
 
 1. [Introduction and Problem Definition](#1-introduction-and-problem-definition)
 2. [System Overview](#2-system-overview)
-   - [Indexing Pipeline](#indexing-pipeline)
-   - [Query Pipeline](#query-pipeline)
+   - 2.1. [Indexing Pipeline](#indexing-pipeline)
+   - 2.2. [Query Pipeline](#query-pipeline)
 3. [Corpus and Data Preparation](#3-corpus-and-data-preparation)
 4. [Retrieval Component](#4-retrieval-component)
 5. [Generation Component](#5-generation-component)
@@ -31,7 +31,7 @@ The engineering goal is to combine lexical and semantic retrieval with grounded 
 
 The implementation uses LlamaIndex for indexing, retrieval, and query execution. Hybrid retrieval was selected because repair questions contain both exact terms, such as device models, part names and screw sizes, and paraphrased descriptions that benefit from semantic matching. The system provides one-shot and interactive command-line modes, plus a retriever-only mode for inspecting search results without calling an LLM.
 
-### Indexing Pipeline
+### 2.1. Indexing Pipeline
 
 ```mermaid
 flowchart LR
@@ -45,7 +45,7 @@ flowchart LR
     end
 ```
 
-### Query Pipeline
+### 2.2. Query Pipeline
 
 ```mermaid
 flowchart LR
@@ -106,11 +106,11 @@ These instructions reduce hallucination but do not guarantee factual correctness
 
 ## 6. Text Mining Features
 
-The implemented text-mining layer performs rule-based guide analysis:
+The implemented text-mining layer performs rule-based analysis when the corpus is loaded. It joins all step text from a guide, converts it to lowercase, and produces metadata that is stored with every chunk created from that guide:
 
 - Counts steps and listed tools.
-- Detects predefined risk terms such as `battery`, `heat`, `fragile`, `connector`, and `glass`.
-- Counts common repair actions such as `remove`, `disconnect`, `pry`, and `lift`.
+- Detects unique occurrences of predefined risk indicators such as `battery`, `heat`, `fragile`, `connector`, and `glass`.
+- Counts every occurrence of common repair actions such as `remove`, `disconnect`, `pry`, and `lift`.
 - Classifies guide complexity as low, medium, or high.
 
 The raw complexity value is:
@@ -123,6 +123,8 @@ number of steps +
 ```
 
 This value is converted to a percentile-like score from 0 to 100 using the full corpus distribution. Scores up to 33 are low, scores up to 66 are medium, and higher scores are high. The analysis is attached to chunk metadata, displayed with source output, and made available to the generation prompt.
+
+For example, a guide with 12 steps, 3 tools, the indicators `battery` and `connector`, and 9 detected action occurrences receives a raw score of `12 + 6 + 6 + 9 = 33`. Its final score and label depend on where 33 ranks among all guide scores. Source output presents the result in a compact form such as `Complexity: medium (score 54/100)`, followed by the step count, tool count, detected risk indicators, and action frequencies.
 
 This is a heuristic complexity classification, not a safety assessment. Detection uses substring matching and a fixed vocabulary, so it can miss synonyms and produce false matches. Future improvements could include more sophisticated keyword extraction, topic modeling, and clustering to identify common repair patterns.
 

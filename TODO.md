@@ -77,7 +77,7 @@
 - [x] Describe corpus source, fields, cleaning, and chunking.
 - [x] Describe embedding model and vector retrieval.
 - [x] Describe generator model and prompt strategy.
-- [ ] Describe text-mining features with examples.
+- [x] Describe text-mining features with examples.
 - [ ] Add evaluation methodology.
 - [ ] Add evaluation results table.
 - [ ] Add strengths, limitations, and failure analysis.
