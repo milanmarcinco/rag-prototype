@@ -43,12 +43,12 @@
 
 ## 6. Evaluation
 
-- [ ] Create `eval/eval_queries.json`.
+- [x] Create `eval/eval_queries.json`.
 - [x] Add 10-20 test questions.
-- [ ] For each question, define expected guide/category/keywords.
-- [ ] Create `src/evaluate.py`.
-- [ ] Measure retrieval hit rate at `k=3`.
-- [ ] Measure retrieval hit rate at `k=5`.
+- [x] For each question, define expected guide/category/keywords.
+- [x] Create `src/evaluate.py`.
+- [x] Measure retrieval hit rate at `k=3`.
+- [x] Measure retrieval hit rate at `k=5`.
 - [ ] Record whether answers cite relevant sources.
 - [ ] Score answer usefulness manually on a 1-5 scale.
 - [ ] Save evaluation outputs to `eval/results.json`.

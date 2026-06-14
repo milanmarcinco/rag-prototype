@@ -1,0 +1,122 @@
+[
+  {
+    "question": "Where should the metal spudger be inserted when removing the antenna cover from a first-generation iPhone?",
+    "expected_guide_id": 449,
+    "category": "component_removal",
+    "keywords": ["dock connector", "antenna cover", "not inside", "between"]
+  },
+  {
+    "question": "How do the top and bottom casing screws of a BlackBerry 7290 differ?",
+    "expected_guide_id": 1386,
+    "category": "screws_fasteners",
+    "keywords": ["0.413 inches", "0.2 inches", "four top screws", "two bottom screws", "T6 Torx"]
+  },
+  {
+    "question": "What precautions should be taken if an iPhone 3GS has cracked display glass before it is opened?",
+    "expected_guide_id": 1546,
+    "category": "safety",
+    "keywords": ["packing tape", "contain shards", "safety glasses", "overlapping strips"]
+  },
+  {
+    "question": "Why should the iPhone 3GS display initially be raised only to an angle of about 45 degrees?",
+    "expected_guide_id": 1546,
+    "category": "warning_caution",
+    "keywords": ["three cables", "cable 4", "stick", "torn"]
+  },
+  {
+    "question": "How should the dock connector assembly be positioned during iPhone 3GS reassembly to avoid breaking Home button operation?",
+    "expected_guide_id": 1551,
+    "category": "reassembly",
+    "keywords": ["over the bezel", "screw holder", "underneath", "Home button"]
+  },
+  {
+    "question": "An iPhone 3GS develops signal problems after its logic board was removed. What component should be inspected?",
+    "expected_guide_id": 1546,
+    "category": "warning_caution",
+    "keywords": ["golden grounding tab", "Do not remove sticker", "snagged", "broken"]
+  },
+  {
+    "question": "What part must be reinstalled when replacing the lower front casing of a Motorola Razr V3c?",
+    "expected_guide_id": 1837,
+    "category": "reassembly",
+    "keywords": ["metallic grounding grid", "lower front casing", "reinstall"]
+  },
+  {
+    "question": "Must the LCD be removed before taking the main board out of an LG VX5200?",
+    "expected_guide_id": 1945,
+    "category": "component_removal",
+    "keywords": ["not necessary", "LCD", "main board"]
+  },
+  {
+    "question": "Can the LCD and speaker of a Nokia 6010 be replaced independently?",
+    "expected_guide_id": 2039,
+    "category": "component_removal",
+    "keywords": ["same plastic piece", "replaced together", "attached"]
+  },
+  {
+    "question": "What should be avoided while prying the charger connector out of a Nokia 6010?",
+    "expected_guide_id": 2041,
+    "category": "warning_caution",
+    "keywords": ["bending", "metal leads", "spudger", "gently"]
+  },
+  {
+    "question": "How should a Motorola Moto Q be oriented when separating its front and back casings with an opening tool?",
+    "expected_guide_id": 2095,
+    "category": "component_removal",
+    "keywords": ["face up", "opening tool", "downward", "slide", "all sides"]
+  },
+  {
+    "question": "Why should the logic board of a Motorola i265 not be pulled completely out immediately after it is lifted?",
+    "expected_guide_id": 2218,
+    "category": "warning_caution",
+    "keywords": ["electrical strip", "top", "connecting switch", "spudger"]
+  },
+  {
+    "question": "Where are the five rear screws on a Nokia 8260, and which ones are longer?",
+    "expected_guide_id": 2426,
+    "category": "screws_fasteners",
+    "keywords": ["bottom", "middle", "antenna door", "two bottom screws", "longer"]
+  },
+  {
+    "question": "The logic board in a Motorola C290 feels glued in place. Is it, and how should it be removed?",
+    "expected_guide_id": 2490,
+    "category": "component_removal",
+    "keywords": ["not glued", "slot at the top", "angle", "pull out"]
+  },
+  {
+    "question": "What must be checked when installing a replacement battery in a Motorola V276?",
+    "expected_guide_id": 2506,
+    "category": "reassembly",
+    "keywords": ["metal connectors", "align", "supply power"]
+  },
+  {
+    "question": "How is the speaker reached in the upper section of an LG VX4500?",
+    "expected_guide_id": 2513,
+    "category": "component_removal",
+    "keywords": ["gray rubber caps", "1.3 mm screws", "upper screen casing", "flathead screwdriver"]
+  },
+  {
+    "question": "How many screws secure the back cover of a Samsung SGH-A237, and where are they located?",
+    "expected_guide_id": 2550,
+    "category": "screws_fasteners",
+    "keywords": ["five", "Phillips #00", "four corners", "top"]
+  },
+  {
+    "question": "After exposing the battery in a Motorola V60i, how is the battery released?",
+    "expected_guide_id": 2628,
+    "category": "component_removal",
+    "keywords": ["release button", "bottom", "spudger", "finger"]
+  },
+  {
+    "question": "What trim piece must be removed before unscrewing the housing of a BlackBerry 7100g?",
+    "expected_guide_id": 2663,
+    "category": "component_removal",
+    "keywords": ["silver strip", "pry up", "plastic opening tool", "full length"]
+  },
+  {
+    "question": "Why is a soldering iron needed when replacing the speaker in a Samsung SPH-A500?",
+    "expected_guide_id": 2693,
+    "category": "wiring_soldering",
+    "keywords": ["speaker wires", "disconnected", "soldered", "replacement speaker", "silver tape"]
+  }
+]
