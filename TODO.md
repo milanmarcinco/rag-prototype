@@ -39,7 +39,7 @@
 - [x] Create `src/lib/text_mining.py`.
 - [x] Add repair complexity and risk classification.
 - [x] Display text-mining output in the CLI demo.
-- [ ] Save at least one text-mining example for the report.
+- [x] Save at least one text-mining example for the report.
 
 ## 6. Evaluation
 
