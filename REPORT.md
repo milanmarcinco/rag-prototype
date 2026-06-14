@@ -149,8 +149,28 @@ Common actions: remove (7), disconnect (3), pry (1), lift (3), pull (1), peel (1
 This is a heuristic complexity classification, not a safety assessment. Detection uses substring matching and a fixed vocabulary, so it can miss synonyms and produce false matches. Future improvements could include more sophisticated keyword extraction, topic modeling, and clustering to identify common repair patterns.
 
 ## 7. Evaluation and Validation
+Retrieval accuracy was measured with 20 questions drawn from the indexed subset. Each question has an expected source guide ID and a category label. Two metrics were recorded: Hit Rate (whether the expected guide is in the top-k results) and Mean Reciprocal Rank (MRR). Tests were run at k=3 and k=5 for both default guide-level chunks and smaller 5-step windows. 
 
-...
+The query "Why is a soldering iron needed when replacing the speaker in a Samsung SPH-A500?" (expected guide 2693) was retrieved at rank 1 in every configuration. The question combines a specific device name and tool with a procedural intent. BM25 matched the exact terms "soldering iron" and "Samsung SPH-A500", while the dense embedding aligned the query with the guide's description of disconnecting and soldering speaker wires. This shows how hybrid retrieval succeeds when lexical and semantic signals reinforce each other.
+
+The four test configurations are summarized below.
+| Configuration       | Hit Rate | MRR   |
+| ------------------- | -------- | ----- |
+| k=3, default chunks | 60.0%    | 0.425 |
+| k=5, default chunks | 75.0%    | 0.491 |
+| k=3, 5-step chunks  | 50.0%    | 0.375 |
+| k=5, 5-step chunks  | 70.0%    | 0.423 |
+
+Default guide-level chunking outperformed the 5-step window in every case. The smaller window apparently splits warnings and prerequisites from the steps they protect, making it harder to match questions that rely on those contextual cues.
+
+Category breakdown (k=5, default chunks). The strongest categories are screws_fasteners and wiring_soldering, both at 100% hit rate. These questions contain exact measurements, tool names, or distinctive verbs that BM25 captures well.
+
+Persistent failures. Four queries were never retrieved in any configuration:
+
+- iPhone 1st generation antenna cover spudger placement (guide 449) - The system found other iPhone 1st gen guides instead. All these guides talk about the same phone, so the retriever could not tell which one had the exact step about the antenna cover.
+- iPhone 3GS 45-degree display warning (guide 1546) - The system found other iPhone 3GS repair guides first. The correct guide is about replacing the dock connector, but the warning about the display angle is just one small step inside it. The retriever missed it because the guide is mostly about something else.
+- LG VX5200 LCD/main board removal order (guide 1945) - The answer is simply "no, you do not need to remove the LCD first." But the guide is long and the word "no" or "not necessary" is just a tiny part of it. The embedding does not give enough weight to this short negation.
+- Motorola V276 battery connector alignment (guide 2506) - The user asks about battery installation, but the actual guide is about replacing the flex cable. The battery step is only mentioned briefly inside that guide. The retriever looks for guides mainly about batteries, so it misses this one.
 
 ## 8. Results and Discussion
 

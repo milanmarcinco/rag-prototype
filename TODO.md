@@ -49,11 +49,11 @@
 - [x] Create `src/evaluate.py`.
 - [x] Measure retrieval hit rate at `k=3`.
 - [x] Measure retrieval hit rate at `k=5`.
-- [ ] Record whether answers cite relevant sources.
-- [ ] Score answer usefulness manually on a 1-5 scale.
-- [ ] Save evaluation outputs to `eval/results.json`.
-- [ ] Identify 2-3 failure cases.
-- [ ] Explain why the failure cases happen.
+- [x] Record whether answers cite relevant sources.
+- [x] Score answer usefulness manually on a 1-5 scale.
+- [x] Save evaluation outputs to `eval/results.json`.
+- [x] Identify 2-3 failure cases.
+- [x] Explain why the failure cases happen.
 
 ## 7. README
 
@@ -74,8 +74,8 @@
 - [x] Describe embedding model and vector retrieval.
 - [x] Describe generator model and prompt strategy.
 - [x] Describe text-mining features with examples.
-- [ ] Add evaluation methodology.
-- [ ] Add evaluation results table.
+- [x] Add evaluation methodology.
+- [x] Add evaluation results table.
 - [ ] Add strengths, limitations, and failure analysis.
 - [ ] Add future improvements.
 - [x] Add conclusion.
