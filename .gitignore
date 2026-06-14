@@ -1,6 +1,5 @@
 env/
 
-dataset.json
 storage/
 storage.*/
 
