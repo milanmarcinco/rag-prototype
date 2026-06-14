@@ -250,30 +250,28 @@ The prototype provides the main RAG workflow: corpus loading, persistent semanti
 
 **Strengths.** The hybrid retriever combines the complementary properties of BM25 and dense retrieval effectively. Questions with distinctive lexical content, such as exact model names, tool names, or measurements, are handled well by BM25, while paraphrased or intent-based questions benefit from the dense component. At k=5 with default chunking, 75% of questions retrieved the correct guide and the MRR of 0.491 indicates that the correct guide was frequently ranked near the top when it was retrieved at all. Guide-level chunking proved more robust than step windows across every tested configuration, suggesting that preserving full guide context matters more than reducing chunk size for this corpus and query set. The prompt engineering prevents the generator from introducing information that is absent from the retrieved context, and the `--print-sources` flag lets users inspect the evidence behind every answer.
 
-**Limitations.** The evaluation set of 20 questions is small, and all questions were drawn from the indexed subset, so the reported metrics do not generalize to the full 3,682-guide corpus. The retriever has no mechanism to distinguish which step within a guide is most relevant to a query; it ranks whole guides, so a single-step answer buried in a long guide is difficult to surface. Negation handling is poor: queries whose correct answer is a negative fact (e.g., "is X necessary?") are not reliably matched. 
+**Limitations.** The evaluation set of 20 questions is small, and all questions were drawn from the indexed subset, so the reported metrics do not generalize to the full 3,682-guide corpus. The retriever has no mechanism to distinguish which step within a guide is most relevant to a query; it ranks whole guides, so a single-step answer buried in a long guide is difficult to surface. Negation handling is poor: queries whose correct answer is a negative fact (e.g., "is X necessary?") are not reliably matched.
 
 ## 10. Future Improvements
 
 Several directions could improve retrieval accuracy and answer quality.
- 
-**Reranking.** A cross-encoder reranker applied after initial retrieval could re-score the top candidates using the full query–chunk pair rather than independent embeddings. This would help in cases where the correct guide is retrieved but ranked below less relevant results, and could also improve negation handling by attending to the relationship between query and document more carefully.
- 
-**Metadata filtering.** Device model names and categories are already stored as chunk metadata. Extracting these from the query and applying pre-filters before retrieval would reduce false positives caused by guides for different devices of the same brand.
- 
-**Query expansion.** Generating alternative phrasings of the query before retrieval, for example by expanding abbreviations or adding synonyms for common repair terms, could improve recall for queries whose vocabulary does not overlap well with the indexed text.
- 
-**Step-level indexing with guide-level context.** Rather than choosing between whole-guide chunks and small step windows, a two-level index could store individual steps as the primary retrieval unit while attaching the surrounding guide context to each step. This would allow precise step-level matching while preserving the prerequisites and warnings needed for a complete answer.
- 
-**Larger evaluation set.** The current 20-question benchmark is too small to draw reliable conclusions about category-level performance. Expanding it to cover more guides, more question types per category, and explicit negation and topic-mismatch cases would give a more accurate picture of system behaviour.
- 
-**Complexity heuristic validation.** The current weights and vocabulary were chosen heuristically. Comparing the heuristic labels against human difficulty ratings for a sample of guides would establish whether the classifier is well-calibrated and suggest which terms or weights need adjustment.
 
+**Reranking.** A cross-encoder reranker applied after initial retrieval could re-score the top candidates using the full query–chunk pair rather than independent embeddings. This would help in cases where the correct guide is retrieved but ranked below less relevant results, and could also improve negation handling by attending to the relationship between query and document more carefully.
+
+**Metadata filtering.** Device model names and categories are already stored as chunk metadata. Extracting these from the query and applying pre-filters before retrieval would reduce false positives caused by guides for different devices of the same brand.
+
+**Query expansion.** Generating alternative phrasings of the query before retrieval, for example by expanding abbreviations or adding synonyms for common repair terms, could improve recall for queries whose vocabulary does not overlap well with the indexed text.
+
+**Step-level indexing with guide-level context.** Rather than choosing between whole-guide chunks and small step windows, a two-level index could store individual steps as the primary retrieval unit while attaching the surrounding guide context to each step. This would allow precise step-level matching while preserving the prerequisites and warnings needed for a complete answer.
+
+**Larger evaluation set.** The current 20-question benchmark is too small to draw reliable conclusions about category-level performance. Expanding it to cover more guides, more question types per category, and explicit negation and topic-mismatch cases would give a more accurate picture of system behaviour.
+
+**Complexity heuristic validation.** The current weights and vocabulary were chosen heuristically. Comparing the heuristic labels against human difficulty ratings for a sample of guides would establish whether the classifier is well-calibrated and suggest which terms or weights need adjustment.
 
 ## 11. Conclusion
 
 This project demonstrates a repair-focused RAG pipeline built around the MyFixit corpus. The system combines BM25 lexical retrieval and dense semantic retrieval through reciprocal-rank fusion, generates answers grounded exclusively in the retrieved context using either a hosted or local language model, and attaches a rule-based complexity and risk estimate to every indexed guide.
- 
-Evaluation over 20 questions shows that the hybrid retriever achieves a 75% hit rate and an MRR of 0.491 at k=5 with guide-level chunking. Guide-level chunking consistently outperformed smaller step-window chunks because repair procedures depend on context spread across multiple steps. The strongest retrieval results come from questions with distinctive lexical content, while the most persistent failures involve guides whose primary topic differs from the query's surface intent, negation facts buried in long guides, and near-duplicate device guides that share most of their vocabulary.
- 
-The prototype is configurable, reproducible, and fully local except for the optional Gemini generation path. It provides a solid baseline for further experimentation with reranking, metadata filtering, and step-level indexing.
 
+Evaluation over 20 questions shows that the hybrid retriever achieves a 75% hit rate and an MRR of 0.491 at k=5 with guide-level chunking. Guide-level chunking consistently outperformed smaller step-window chunks because repair procedures depend on context spread across multiple steps. The strongest retrieval results come from questions with distinctive lexical content, while the most persistent failures involve guides whose primary topic differs from the query's surface intent, negation facts buried in long guides, and near-duplicate device guides that share most of their vocabulary.
+
+The prototype is configurable, reproducible, and fully local except for the optional Gemini generation path. It provides a solid baseline for further experimentation with reranking, metadata filtering, and step-level indexing.
