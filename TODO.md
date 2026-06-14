@@ -29,12 +29,10 @@
 
 ## 4. Corpus Preparation
 
-- [ ] Document the dataset source and how to obtain it.
-- [ ] Record corpus size: manuals, chunks, categories, average steps.
-- [ ] Verify all required metadata fields are loaded correctly.
-- [ ] Decide whether to index all manuals or a subset for final demo.
-- [ ] Document chunking strategy: one manual step per document.
-- [ ] Document trade-offs of step-level chunking.
+- [x] Document the dataset source and how to obtain it.
+- [x] Record corpus size: manuals, chunks, categories, average steps.
+- [x] Document the configurable whole-guide and step-window chunking strategy.
+- [x] Document chunking trade-offs.
 
 ## 5. Text Mining Features
 
@@ -50,7 +48,7 @@
 ## 6. Evaluation
 
 - [ ] Create `eval/eval_queries.json`.
-- [ ] Add 10-20 test questions.
+- [x] Add 10-20 test questions.
 - [ ] For each question, define expected guide/category/keywords.
 - [ ] Create `src/evaluate.py`.
 - [ ] Measure retrieval hit rate at `k=3`.
@@ -63,29 +61,28 @@
 
 ## 7. README
 
-- [ ] Add exact command for running a one-shot query.
-- [ ] Add exact command for interactive mode.
-- [ ] Add exact command for rebuilding the index.
-- [ ] Clarify Ollama-only vs Gemini-backed generation.
-- [ ] List required Ollama models to pull.
-- [ ] Add dataset placement instructions.
-- [ ] Add a short project summary and use case.
+- [x] Add exact command for running a one-shot query.
+- [x] Add exact command for interactive mode.
+- [x] Add exact command for rebuilding the index.
+- [x] Clarify Ollama-only vs Gemini-backed generation.
+- [x] List required Ollama models to pull.
+- [x] Add a short project summary and use case.
 
 ## 8. Report
 
-- [ ] Create `report/report.md`.
-- [ ] Write problem definition and target users.
-- [ ] Explain why PC repair manuals are a suitable RAG use case.
-- [ ] Add high-level architecture diagram.
-- [ ] Describe corpus source, fields, cleaning, and chunking.
-- [ ] Describe embedding model and vector retrieval.
-- [ ] Describe generator model and prompt strategy.
+- [x] Create `REPORT.md`.
+- [x] Write problem definition and target users.
+- [x] Explain why repair manuals are a suitable RAG use case.
+- [x] Add high-level architecture diagram.
+- [x] Describe corpus source, fields, cleaning, and chunking.
+- [x] Describe embedding model and vector retrieval.
+- [x] Describe generator model and prompt strategy.
 - [ ] Describe text-mining features with examples.
 - [ ] Add evaluation methodology.
 - [ ] Add evaluation results table.
 - [ ] Add strengths, limitations, and failure analysis.
 - [ ] Add future improvements.
-- [ ] Add conclusion.
+- [x] Add conclusion.
 
 ## 9. Presentation
 
@@ -104,7 +101,7 @@
 - [ ] Run the prototype from a clean terminal.
 - [ ] Rebuild the index successfully.
 - [ ] Run evaluation successfully.
-- [ ] Confirm ignored files are not committed: `.env`, `dataset/`, `storage/`, `env/`.
+- [x] Confirm ignored files are not committed: `.env`, `dataset/`, `storage/`, `env/`.
 - [ ] Check that README instructions match the actual commands.
-- [ ] Check that report claims match implemented features.
+- [x] Check that report claims match implemented features.
 - [ ] Commit source code, docs, report, and evaluation files.
