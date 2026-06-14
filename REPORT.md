@@ -10,16 +10,20 @@
 2. [System Overview](#2-system-overview)
    - 2.1. [Indexing Pipeline](#21-indexing-pipeline)
    - 2.2. [Query Pipeline](#22-query-pipeline)
-3. [Corpus and Data Preparation](#3-corpus-and-data-preparation)
-4. [Retrieval Component](#4-retrieval-component)
-5. [Generation Component](#5-generation-component)
-6. [Text Mining Features](#6-text-mining-features)
-7. [Evaluation and Validation](#7-evaluation-and-validation)
-   - 7.1. [Worked Query Example](#71-worked-query-example)
-   - 7.2. [Success and Failure Analysis](#72-success-and-failure-analysis)
-8. [Results and Discussion](#8-results-and-discussion)
-9. [Future Improvements](#9-future-improvements)
-10. [Conclusion](#10-conclusion)
+3. [Requirements, Setup, Configuration, and Usage](#3-requirements-setup-configuration-and-usage)
+   - 3.1. [Requirements and Setup](#31-requirements-and-setup)
+   - 3.2. [Configuration](#32-configuration)
+   - 3.3. [Usage and Command-Line Options](#33-usage-and-command-line-options)
+4. [Corpus and Data Preparation](#4-corpus-and-data-preparation)
+5. [Retrieval Component](#5-retrieval-component)
+6. [Generation Component](#6-generation-component)
+7. [Text Mining Features](#7-text-mining-features)
+8. [Evaluation and Validation](#8-evaluation-and-validation)
+   - 8.1. [Worked Query Example](#81-worked-query-example)
+   - 8.2. [Success and Failure Analysis](#82-success-and-failure-analysis)
+9. [Results and Discussion](#9-results-and-discussion)
+10. [Future Improvements](#10-future-improvements)
+11. [Conclusion](#11-conclusion)
 
 ## 1. Introduction and Problem Definition
 
@@ -65,7 +69,69 @@ flowchart LR
     end
 ```
 
-## 3. Corpus and Data Preparation
+## 3. Requirements, Setup, Configuration, and Usage
+
+### 3.1. Requirements and Setup
+
+The project requires `mise` version 2026.4.28 or newer. Its `mise.toml` installs Python 3.12.0 and Ollama 0.23.2. A Gemini API key is optional because answer generation can instead run through a local Ollama model.
+
+```sh
+mise install
+python -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+Start Ollama in a separate terminal and leave it running:
+
+```sh
+ollama serve
+```
+
+Then download the required embedding model:
+
+```sh
+ollama pull nomic-embed-text
+```
+
+The Ollama service must remain running while the application is used. `nomic-embed-text` is always required because embeddings are generated locally. When Gemini is not configured, the default local generation model must also be downloaded with `ollama pull qwen3.5:4b`.
+
+### 3.2. Configuration
+
+Runtime configuration is loaded from `.env`:
+
+| Variable             | Default                  | Purpose                                                           |
+| -------------------- | ------------------------ | ----------------------------------------------------------------- |
+| `DATASET_DIR`        | `dataset`                | Directory containing `dataset.json`.                              |
+| `PERSIST_DIR`        | `storage`                | Directory used for the persisted LlamaIndex data.                 |
+| `OLLAMA_BASE_URL`    | `http://localhost:11434` | Address of the Ollama service.                                    |
+| `OLLAMA_EMBED_MODEL` | `nomic-embed-text`       | Ollama model used to embed corpus chunks and queries.             |
+| `OLLAMA_LLM_MODEL`   | `qwen3.5:4b`             | Local answer-generation model used when Gemini is not configured. |
+| `GEMINI_API_KEY`     | unset                    | Enables Gemini answer generation when set to a valid API key.     |
+| `GEMINI_LLM_MODEL`   | `gemini-2.5-flash`       | Gemini model used for answer generation.                          |
+
+The placeholder `GEMINI_API_KEY` in `.env.example` must be replaced with a valid key or removed to select the local Ollama generator. Ollama is required in both configurations for embedding generation.
+
+### 3.3. Usage and Command-Line Options
+
+The application is started with `python src/main.py`. Without `--query`, it opens an interactive prompt; with `--query`, it answers one question and exits. The first run builds and persists the index, while subsequent runs load it from `PERSIST_DIR`.
+
+| Option                      |          Default | Purpose                                                                                           |
+| --------------------------- | ---------------: | ------------------------------------------------------------------------------------------------- |
+| `-h`, `--help`              |              N/A | Displays command-line help and exits.                                                             |
+| `--query TEXT`              | interactive mode | Answers one question non-interactively.                                                           |
+| `--top-k INTEGER`           |              `3` | Sets the number of fused document chunks retrieved before answering.                              |
+| `--print-sources`           |         disabled | Prints the retrieved source documents after the generated answer.                                 |
+| `--retriever-only`          |         disabled | Retrieves and prints matching chunks without calling an answer-generation LLM.                    |
+| `--max-manuals INTEGER`     |            `100` | Limits how many manuals are loaded from the dataset when building the index.                      |
+| `--steps-per-chunk INTEGER` |  all guide steps | Splits each guide into chunks containing at most this many consecutive steps.                     |
+| `--steps-overlap INTEGER`   |              `0` | Sets the number of repeated steps between consecutive chunks when step-based chunking is enabled. |
+| `--rebuild-index`           |         disabled | Deletes and regenerates the persisted index before querying.                                      |
+
+The index should be rebuilt after changing the dataset, embedding model, corpus limit, or chunking options. In particular, `--max-manuals`, `--steps-per-chunk`, and `--steps-overlap` only affect newly built indexes.
+
+## 4. Corpus and Data Preparation
 
 The local corpus is derived from the [MyFixit dataset](https://github.com/rub-ksv/MyFixit-Dataset). It is stored as a JSON Lines file in which each record represents one repair guide.
 
@@ -83,7 +149,7 @@ A scan of the local dataset found no missing guide IDs, titles, categories, step
 
 By default, all steps from one guide form one document chunk. This choice preserves prerequisites, warnings, and chronological dependencies that may be lost when an individual step is retrieved alone. The trade-off is that long guides add irrelevant text to the prompt and can reduce retrieval precision. The `--steps-per-chunk` option supports smaller consecutive step windows, while `--steps-overlap` can preserve limited context between adjacent windows.
 
-## 4. Retrieval Component
+## 5. Retrieval Component
 
 The system uses hybrid retrieval:
 
@@ -100,7 +166,7 @@ Dense retrieval handles paraphrases, while BM25 favors exact device names, compo
 
 Current limitations include the absence of reranking, metadata filters, query expansion.
 
-## 5. Generation Component
+## 6. Generation Component
 
 The generator is selected from environment configuration:
 
@@ -114,7 +180,7 @@ Retrieved chunks are inserted into a custom repair prompt as a single block of f
 
 These instructions reduce hallucination but do not guarantee factual correctness. Sources can be printed after the answer with `--print-sources`, but the generated answer does not contain formal inline citations.
 
-## 6. Text Mining Features
+## 7. Text Mining Features
 
 The implemented text-mining layer performs rule-based analysis when the corpus is loaded. It joins all step text from a guide, converts it to lowercase, and produces metadata that is stored with every chunk created from that guide:
 
@@ -148,18 +214,24 @@ Common actions: remove (7), disconnect (3), pry (1), lift (3), pull (1), peel (1
 
 This is a heuristic complexity classification, not a safety assessment. Detection uses substring matching and a fixed vocabulary, so it can miss synonyms and produce false matches. Future improvements could include more sophisticated keyword extraction, topic modeling, and clustering to identify common repair patterns.
 
-## 7. Evaluation and Validation
-Retrieval accuracy was measured with 20 questions drawn from the indexed subset. Each question has an expected source guide ID and a category label. Two metrics were recorded: Hit Rate (whether the expected guide is in the top-k results) and Mean Reciprocal Rank (MRR). Tests were run at k=3 and k=5 for both default guide-level chunks and smaller 5-step windows. 
+## 8. Evaluation and Validation
+
+Retrieval accuracy was measured with 20 questions drawn from the indexed subset. Each question has an expected source guide ID and a category label. Two metrics were recorded: Hit Rate (whether the expected guide is in the top-k results) and Mean Reciprocal Rank (MRR). Tests were run at k=3 and k=5 for both default guide-level chunks and smaller 5-step windows.
+
+### 8.1. Worked Query Example
 
 The query "Why is a soldering iron needed when replacing the speaker in a Samsung SPH-A500?" (expected guide 2693) was retrieved at rank 1 in every configuration. The question combines a specific device name and tool with a procedural intent. BM25 matched the exact terms "soldering iron" and "Samsung SPH-A500", while the dense embedding aligned the query with the guide's description of disconnecting and soldering speaker wires. This shows how hybrid retrieval succeeds when lexical and semantic signals reinforce each other.
 
 The four test configurations are summarized below.
+
 | Configuration       | Hit Rate | MRR   |
 | ------------------- | -------- | ----- |
 | k=3, default chunks | 60.0%    | 0.425 |
 | k=5, default chunks | 75.0%    | 0.491 |
 | k=3, 5-step chunks  | 50.0%    | 0.375 |
 | k=5, 5-step chunks  | 70.0%    | 0.423 |
+
+### 8.2. Success and Failure Analysis
 
 Default guide-level chunking outperformed the 5-step window in every case. The smaller window apparently splits warnings and prerequisites from the steps they protect, making it harder to match questions that rely on those contextual cues.
 
@@ -172,7 +244,7 @@ Persistent failures. Four queries were never retrieved in any configuration:
 - LG VX5200 LCD/main board removal order (guide 1945) - The answer is simply "no, you do not need to remove the LCD first." But the guide is long and the word "no" or "not necessary" is just a tiny part of it. The embedding does not give enough weight to this short negation.
 - Motorola V276 battery connector alignment (guide 2506) - The user asks about battery installation, but the actual guide is about replacing the flex cable. The battery step is only mentioned briefly inside that guide. The retriever looks for guides mainly about batteries, so it misses this one.
 
-## 8. Results and Discussion
+## 9. Results and Discussion
 
 The prototype provides the main RAG workflow: corpus loading, persistent semantic indexing, hybrid retrieval, optional local or hosted response generation, source inspection, and guide-level complexity analysis. Its command-line flags make chunking, retrieval depth, corpus size, and index rebuilding configurable.
 
@@ -180,7 +252,7 @@ The prototype provides the main RAG workflow: corpus loading, persistent semanti
 
 **Limitations.** The evaluation set of 20 questions is small, and all questions were drawn from the indexed subset, so the reported metrics do not generalize to the full 3,682-guide corpus. The retriever has no mechanism to distinguish which step within a guide is most relevant to a query; it ranks whole guides, so a single-step answer buried in a long guide is difficult to surface. Negation handling is poor: queries whose correct answer is a negative fact (e.g., "is X necessary?") are not reliably matched. 
 
-## 9. Future Improvements
+## 10. Future Improvements
 
 Several directions could improve retrieval accuracy and answer quality.
  
@@ -197,7 +269,7 @@ Several directions could improve retrieval accuracy and answer quality.
 **Complexity heuristic validation.** The current weights and vocabulary were chosen heuristically. Comparing the heuristic labels against human difficulty ratings for a sample of guides would establish whether the classifier is well-calibrated and suggest which terms or weights need adjustment.
 
 
-## 10. Conclusion
+## 11. Conclusion
 
 This project demonstrates a repair-focused RAG pipeline built around the MyFixit corpus. The system combines BM25 lexical retrieval and dense semantic retrieval through reciprocal-rank fusion, generates answers grounded exclusively in the retrieved context using either a hosted or local language model, and attaches a rule-based complexity and risk estimate to every indexed guide.
  
